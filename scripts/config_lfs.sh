@@ -1,36 +1,58 @@
 #!/bin/bash
 
-# 9.2.1. Installation of LFS-Bootscripts
-/alfs/packages/lfs-bootscripts.sh
+# 9.2.1.1. Network Device Naming
+ln -s /dev/null /etc/systemd/network/99-default.link
 
-#9.4.1.2. Creating Custom Udev Rules
-bash /lib/udev/init-net-rules.sh
+cat > /etc/systemd/network/10-ether0.link << "EOF"
+[Match]
+# Change the MAC address as appropriate for your network device
+MACAddress=12:34:45:78:90:AB
 
-# 9.5.1. Creating Network Interface Configuration Files
-cd /etc/sysconfig/
-cat > ifconfig.eth0 << "EOF"
-ONBOOT=yes
-IFACE=eth0
-SERVICE=ipv4-static
-IP=192.168.1.2
-GATEWAY=192.168.1.1
-PREFIX=24
-BROADCAST=192.168.1.255
+[Link]
+Name=ether0
 EOF
 
-# 9.5.2. Creating the /etc/resolv.conf File
+# 9.2.1.2. Static IP Configuration
+cat > /etc/systemd/network/10-eth-static.network << "EOF"
+[Match]
+Name=ether0
+
+[Network]
+Address=192.168.0.2/24
+Gateway=192.168.0.1
+DNS=192.168.0.1
+Domains=
+EOF
+
+# 9.2.1.3. DHCP Configuration
+cat > /etc/systemd/network/10-eth-dhcp.network << "EOF"
+[Match]
+Name=ether0
+
+[Network]
+DHCP=ipv4
+
+[DHCP]
+UseDomains=true
+EOF
+
+# 9.2.2 Creating the /etc/resolv.conf File
+
+ln -sfv /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
 cat > /etc/resolv.conf << "EOF"
 # Begin /etc/resolv.conf
 
 nameserver 8.8.8.8
+nameserver 8.8.4.4
 
 # End /etc/resolv.conf
 EOF
 
-# 9.5.3. Configuring the system hostname
-echo "LFS" > /etc/hostname
+# 9.2.3. Configuring the system hostname
+echo "Raccoon" > /etc/hostname
 
-# 9.5.4. Customizing the /etc/hosts File
+# 9.2.4. Customizing the /etc/hosts File
 cat > /etc/hosts << "EOF"
 # Begin /etc/hosts
 
@@ -44,56 +66,10 @@ ff02::2   ip6-allrouters
 # End /etc/hosts
 EOF
 
-# 9.6.2. Configuring Sysvinit
-cat > /etc/inittab << "EOF"
-# Begin /etc/inittab
-
-id:3:initdefault:
-
-si::sysinit:/etc/rc.d/init.d/rc S
-
-l0:0:wait:/etc/rc.d/init.d/rc 0
-l1:S1:wait:/etc/rc.d/init.d/rc 1
-l2:2:wait:/etc/rc.d/init.d/rc 2
-l3:3:wait:/etc/rc.d/init.d/rc 3
-l4:4:wait:/etc/rc.d/init.d/rc 4
-l5:5:wait:/etc/rc.d/init.d/rc 5
-l6:6:wait:/etc/rc.d/init.d/rc 6
-
-ca:12345:ctrlaltdel:/sbin/shutdown -t1 -a -r now
-
-su:S016:once:/sbin/sulogin
-
-1:2345:respawn:/sbin/agetty --noclear tty1 9600
-2:2345:respawn:/sbin/agetty tty2 9600
-3:2345:respawn:/sbin/agetty tty3 9600
-4:2345:respawn:/sbin/agetty tty4 9600
-5:2345:respawn:/sbin/agetty tty5 9600
-6:2345:respawn:/sbin/agetty tty6 9600
-
-# End /etc/inittab
-EOF
-
-# 9.6.4. Configuring the System Clock
-cat > /etc/sysconfig/clock << "EOF"
-# Begin /etc/sysconfig/clock
-
-UTC=1
-
-# Set this to any options you might need to give to hwclock,
-# such as machine hardware clock type for Alphas.
-CLOCKPARAMS=
-
-# End /etc/sysconfig/clock
-EOF
-
-# 9.6.5. Configuring the Linux Console
-
-# 9.7. The Bash Shell Startup Files
-
 # 9.8. Creating the /etc/inputrc File
 cat > /etc/inputrc << "EOF"
 # Begin /etc/inputrc
+# Modified by Chris Lynn <roryo@roryo.dynup.net>
 
 # Allow the command prompt to wrap to the next line
 set horizontal-scroll-mode Off
@@ -145,6 +121,25 @@ cat > /etc/shells << "EOF"
 # End /etc/shells
 EOF
 
+# 9.10.2. Disabling Screen Clearing at Boot Time
+mkdir -pv /etc/systemd/system/getty@tty1.service.d
+
+cat > /etc/systemd/system/getty@tty1.service.d/noclear.conf << EOF
+[Service]
+TTYVTDisallocate=no
+EOF
+
+# 9.10.3. Disabling tmpfs for /tmp
+ln -sfv /dev/null /etc/systemd/system/tmp.mount
+
+# 9.10.8. Working with Core Dumps
+mkdir -pv /etc/systemd/coredump.conf.d
+
+cat > /etc/systemd/coredump.conf.d/maxuse.conf << EOF
+[Coredump]
+MaxUse=5G
+EOF
+
 # 10.2. Creating the /etc/fstab File
 cat > /etc/fstab << "EOF"
 # Begin /etc/fstab
@@ -152,13 +147,8 @@ cat > /etc/fstab << "EOF"
 # file system  mount-point  type     options             dump  fsck
 #                                                              order
 
-/dev/sda1     /            ext4   defaults            1     1
-#/dev/sda2     swap         swap     pri=1               0     0
-proc           /proc        proc     nosuid,noexec,nodev 0     0
-sysfs          /sys         sysfs    nosuid,noexec,nodev 0     0
-devpts         /dev/pts     devpts   gid=5,mode=620      0     0
-tmpfs          /run         tmpfs    defaults            0     0
-devtmpfs       /dev         devtmpfs mode=0755,nosuid    0     0
+/dev/<xxx>     /            <fff>    defaults            1     1
+/dev/<yyy>     swap         swap     pri=1               0     0
 
 # End /etc/fstab
 EOF
@@ -176,18 +166,18 @@ cp /alfs/defaults/bashrc /root/.bashrc
 echo 10.0 > /etc/lfs-release
 
 cat > /etc/lsb-release << "EOF"
-DISTRIB_ID="Linux From Scratch"
+DISTRIB_ID="Raccoon"
 DISTRIB_RELEASE="10.0"
-DISTRIB_CODENAME="Windy"
+DISTRIB_CODENAME="White"
 DISTRIB_DESCRIPTION="Linux From Scratch"
 EOF
 
 cat > /etc/os-release << "EOF"
-NAME="Linux From Scratch"
+NAME="Raccoon"
 VERSION="10.0"
 ID=lfs
-PRETTY_NAME="Linux From Scratch 10.0"
-VERSION_CODENAME="Windy"
+PRETTY_NAME="Raccoon 10.0"
+VERSION_CODENAME="White"
 EOF
 
 echo

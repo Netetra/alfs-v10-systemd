@@ -68,12 +68,11 @@
 /alfs/packages/tar.sh
 /alfs/packages/texinfo.sh
 /alfs/packages/vim.sh
-/alfs/packages/eudev.sh
+/alfs/packages/systemd.sh
+/alfs/packages/dbus.sh
 /alfs/packages/procps-ng.sh
 /alfs/packages/util-linux.sh
 /alfs/packages/e2fsprogs.sh
-/alfs/packages/sysklogd.sh
-/alfs/packages/sysvinit.sh
 
 # 8.77. Stripping Again
 

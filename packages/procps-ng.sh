@@ -21,12 +21,10 @@ cd $SRC_FOLDER
             --libdir=/usr/lib                        \
             --docdir=/usr/share/doc/procps-ng-3.3.16 \
             --disable-static                         \
-            --disable-kill
+            --disable-kill                           \
+            --with-systemd
 
 make
-
-#make check
-
 make install
 
 mv -v /usr/lib/libprocps.so.* /lib

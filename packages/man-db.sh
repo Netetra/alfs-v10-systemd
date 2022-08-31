@@ -16,6 +16,8 @@ cd $SRC_FOLDER
 
 # BUILD
 
+sed -i '/find/s@/usr@@' init/systemd/man-db.service.in
+
 ./configure --prefix=/usr                        \
             --docdir=/usr/share/doc/man-db-2.9.3 \
             --sysconfdir=/etc                    \
@@ -23,12 +25,10 @@ cd $SRC_FOLDER
             --enable-cache-owner=bin             \
             --with-browser=/usr/bin/lynx         \
             --with-vgrind=/usr/bin/vgrind        \
-            --with-grap=/usr/bin/grap            \
-            --with-systemdtmpfilesdir=           \
-            --with-systemdsystemunitdir=
+            --with-grap=/usr/bin/grap
 
 make
-#make check
+make check
 make install
 
 # EBC

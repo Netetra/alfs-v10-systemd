@@ -1,10 +1,10 @@
-# Automated Linux From Scratch 10.0 (SysV)
+# Automated Linux From Scratch 10.0 (Systemd)
 
 Tested with Debian 10 Buster.
 
 *This project is based on the Official LFS 10.0 Book*
 
-http://lfs.mirror.fileplanet.com/lfs/view/10.0/
+https://www.linuxfromscratch.org/lfs/view/10.0-systemd/index.html
 
 ## Package Requirements
 
@@ -44,7 +44,7 @@ sudo mount -t ext4 /dev/sdb1 $LFS
 Grab the alfs project files
 
 ```bash
-sudo git clone https://github.com/mattwind/alfs.git $ALFS
+sudo git clone https://github.com/Netetra/alfs-v10-systemd $ALFS
 cd $ALFS
 ```
 

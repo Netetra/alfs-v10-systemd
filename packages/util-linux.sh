@@ -28,9 +28,7 @@ mkdir -pv /var/lib/hwclock
             --disable-runuser    \
             --disable-pylibmount \
             --disable-static     \
-            --without-python     \
-            --without-systemd    \
-            --without-systemdsystemunitdir
+            --without-python
 
 make
 
