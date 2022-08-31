@@ -85,7 +85,7 @@ Below the warning is how I installed grub while inside the chrooted LFS system
 
 Consider reading the LFS book for backing up your bootloader.
 
-http://lfs.mirror.fileplanet.com/lfs/view/stable/chapter10/grub.html
+https://www.linuxfromscratch.org/lfs/view/10.0-systemd//chapter10/grub.html
 
 | :warning: make certain you are in chroot |
 | --- |
@@ -159,11 +159,11 @@ root=/dev/sdb1
 
 *Linux From Scratch 10 Book*
 
-http://lfs.mirror.fileplanet.com/lfs/view/10.0/
+https://www.linuxfromscratch.org/lfs/view/10.0-systemd/
 
 *Beyond Linux From Scrach 10 Book*
 
-http://lfs.mirror.fileplanet.com/blfs/view/10.0/
+https://www.linuxfromscratch.org/blfs/view/10.0-systemd/
 
 *Added compressed single page versions to the books directory*
 
